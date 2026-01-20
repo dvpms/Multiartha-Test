@@ -1,6 +1,7 @@
 import LoginClient from "./LoginClient";
 
-export default function LoginPage({ searchParams }) {
-  const callbackUrl = searchParams?.callbackUrl || "/dashboard";
+export default async function LoginPage({ searchParams }) {
+  const sp = (await searchParams) || {};
+  const callbackUrl = sp.callbackUrl || "/dashboard";
   return <LoginClient callbackUrl={callbackUrl} />;
 }

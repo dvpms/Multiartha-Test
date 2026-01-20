@@ -8,7 +8,7 @@ import { canManageUsers } from "@/features/auth/permissions";
 
 function NavItem({ href, label }) {
   const pathname = usePathname();
-  const active = pathname === href;
+  const active = pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <Link

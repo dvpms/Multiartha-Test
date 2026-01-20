@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id   String @id @default(cuid())
+  name String @unique
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    String   @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  role         Role          @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  transactions Transaction[]
+
+  @@index([roleId])
+  @@map("users")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  stock     Int
+  price     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transactions Transaction[]
+
+  @@index([name])
+  @@map("products")
+}
+
+model Transaction {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  productId  String   @map("product_id")
+  quantity   Int
+  totalPrice Int      @map("total_price")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([productId])
+  @@index([createdAt])
+  @@map("transactions")
+}

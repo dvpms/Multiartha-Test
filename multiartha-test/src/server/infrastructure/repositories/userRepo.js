@@ -1,4 +1,5 @@
 import { prisma } from "../db/prisma";
+import { ROLES } from "../../domain/constants/roles";
 
 export const userRepo = {
   async listWithRole() {
@@ -78,6 +79,6 @@ export const userRepo = {
 
   async countAdmins({ tx } = {}) {
     const client = tx || prisma;
-    return client.user.count({ where: { role: { name: "ADMIN" } } });
+    return client.user.count({ where: { role: { name: ROLES.ADMIN } } });
   },
 };

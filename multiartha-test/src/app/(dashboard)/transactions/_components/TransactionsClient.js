@@ -92,7 +92,12 @@ export default function TransactionsClient() {
                   <td className="px-3 py-3 text-right tabular-nums text-zinc-700">
                     {formatRupiah(t.totalPrice)}
                   </td>
-                  <td className="px-3 py-3 text-zinc-700">{t.user?.email}</td>
+                  <td
+                    className="px-3 py-3 text-zinc-700"
+                    title={t.user?.email || ""}
+                  >
+                    {t.user?.name || t.user?.email}
+                  </td>
                 </tr>
               ))}
               {!loading && rows.length === 0 ? (

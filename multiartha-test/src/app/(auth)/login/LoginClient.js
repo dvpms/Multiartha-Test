@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import Button from "@/components/ui/Button";
@@ -15,10 +15,11 @@ export default function LoginClient({ callbackUrl }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
-  if (status === "authenticated") {
-    router.replace(callbackUrl);
-    return null;
-  }
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(callbackUrl);
+    }
+  }, [status, callbackUrl, router]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -46,6 +47,9 @@ export default function LoginClient({ callbackUrl }) {
     <div className="min-h-screen bg-zinc-50">
       <div className="mx-auto flex min-h-screen max-w-md items-center px-4">
         <Card className="w-full">
+          {status === "authenticated" ? (
+            <div className="py-8 text-center text-sm text-zinc-600">Mengalihkan...</div>
+          ) : null}
           <div className="space-y-1">
             <h1 className="text-xl font-semibold text-zinc-900">
               Sistem Inventaris

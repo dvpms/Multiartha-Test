@@ -1,25 +1,20 @@
 import { prisma } from "../../infrastructure/db/prisma";
 import { auditLogRepo } from "../../infrastructure/repositories/auditLogRepo";
 import { productRepo } from "../../infrastructure/repositories/productRepo";
-import { ConflictError, NotFoundError } from "../../domain/errors/appErrors";
+import { NotFoundError } from "../../domain/errors/appErrors";
 
-export async function deleteProduct({ actorUserId, productId }) {
+export async function restockProduct({ actorUserId, productId, quantity }) {
   return prisma.$transaction(async (tx) => {
     const existing = await productRepo.findById(productId, { tx });
     if (!existing) throw new NotFoundError("Product not found");
 
-    const txCount = await productRepo.countTransactions(productId, { tx });
-    if (txCount > 0) {
-      throw new ConflictError("Cannot delete product with transactions");
-    }
-
-    await productRepo.deleteById(productId, { tx });
+    const updated = await productRepo.incrementStockById(productId, quantity, { tx });
 
     await auditLogRepo.create(
       {
         actorUserId,
         entityType: "product",
-        action: "delete",
+        action: "restock",
         entityId: productId,
         before: {
           id: existing.id,
@@ -27,11 +22,21 @@ export async function deleteProduct({ actorUserId, productId }) {
           stock: existing.stock,
           price: existing.price,
         },
-        after: null,
+        after: {
+          id: updated.id,
+          name: updated.name,
+          stock: updated.stock,
+          price: updated.price,
+        },
+        metadata: {
+          quantityAdded: quantity,
+          stockBefore: existing.stock,
+          stockAfter: updated.stock,
+        },
       },
       { tx }
     );
 
-    return { productId };
+    return updated;
   });
 }

@@ -10,6 +10,10 @@ export const sellProductSchema = z.object({
   quantity: z.coerce.number().int().min(1),
 });
 
+export const restockProductSchema = z.object({
+  quantity: z.coerce.number().int().min(1),
+});
+
 export const updateProductSchema = z
   .object({
     name: z.string().trim().min(1).optional(),

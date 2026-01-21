@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-import { canManageUsers, canSell } from "@/features/auth/permissions";
+import { canManageUsers, canViewSales } from "@/features/auth/permissions";
 
 function NavItem({ href, label }) {
   const pathname = usePathname();
@@ -36,7 +36,8 @@ export default function Sidebar() {
       <nav className="space-y-1">
         <NavItem href="/dashboard" label="Dashboard" />
         <NavItem href="/products" label="Produk" />
-        {canSell(role) ? <NavItem href="/transactions" label="Transaksi" /> : null}
+        {canViewSales(role) ? <NavItem href="/transactions" label="Penjualan" /> : null}
+        {canManageUsers(role) ? <NavItem href="/activities" label="Aktivitas" /> : null}
         {canManageUsers(role) ? <NavItem href="/users" label="User Management" /> : null}
       </nav>
     </aside>

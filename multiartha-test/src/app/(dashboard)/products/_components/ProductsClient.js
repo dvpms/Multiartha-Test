@@ -9,17 +9,18 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
-import { confirmDanger } from "@/lib/alert";
+import { confirmDanger, promptNumber } from "@/lib/alert";
 import { formatRupiah } from "@/lib/format";
 import {
   createProduct,
   deleteProduct,
   getProducts,
+  restockProduct,
   sellProduct,
   updateProduct,
 } from "@/features/products/client";
 import { ROLES } from "@/server/domain/constants/roles";
-import { canSell } from "@/features/auth/permissions";
+import { canPerformSale } from "@/features/auth/permissions";
 
 function stockBadge(stock) {
   if (stock === 0) return <Badge variant="danger">Habis</Badge>;
@@ -37,7 +38,7 @@ export default function ProductsClient() {
   const [sellQty, setSellQty] = useState({});
 
   const isAdmin = role === ROLES.ADMIN;
-  const allowSell = canSell(role);
+  const allowSell = canPerformSale(role);
 
   const [createForm, setCreateForm] = useState({ name: "", stock: "0", price: "0" });
   const [busyById, setBusyById] = useState({});
@@ -129,8 +130,41 @@ export default function ProductsClient() {
     setBusyById((v) => ({ ...v, [product.id]: "sell" }));
     try {
       await sellProduct(product.id, { quantity });
-      toast.success("Transaksi berhasil");
+      toast.success("Penjualan berhasil");
       setSellQty((v) => ({ ...v, [product.id]: 1 }));
+      await load();
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setBusyById((v) => {
+        const next = { ...v };
+        delete next[product.id];
+        return next;
+      });
+    }
+  }
+
+  async function onRestock(product) {
+    const result = await promptNumber({
+      title: "Tambah Stok",
+      text: `Tambah stok untuk produk: ${product.name} (stok saat ini: ${product.stock})`,
+      defaultValue: 1,
+      min: 1,
+      confirmText: "Tambah",
+    });
+
+    if (!result.isConfirmed) return;
+
+    const quantity = Number(result.value);
+    if (!Number.isFinite(quantity) || quantity < 1) {
+      toast.error("Qty harus angka >= 1");
+      return;
+    }
+
+    setBusyById((v) => ({ ...v, [product.id]: "restock" }));
+    try {
+      await restockProduct(product.id, { quantity });
+      toast.success("Stok ditambah");
       await load();
     } catch (e) {
       toast.error(e.message);
@@ -223,7 +257,7 @@ export default function ProductsClient() {
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Produk</h1>
           <p className="text-sm text-zinc-600">
-            CRUD produk (Admin) dan transaksi jual (Admin/Seller).
+            CRUD produk (Admin) dan penjualan (Seller).
           </p>
         </div>
         <Button variant="secondary" onClick={load} disabled={loading}>
@@ -338,11 +372,18 @@ export default function ProductsClient() {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-sm text-zinc-500">View only</span>
+                        <p></p>
                       )}
 
                       {isAdmin ? (
                         <>
+                          <Button
+                            variant="secondary"
+                            onClick={() => onRestock(p)}
+                            disabled={loading || !!busyById[p.id]}
+                          >
+                            {busyById[p.id] === "restock" ? "Menambah..." : "Tambah Stok"}
+                          </Button>
                           <Button
                             variant="secondary"
                             onClick={() => openEdit(p)}

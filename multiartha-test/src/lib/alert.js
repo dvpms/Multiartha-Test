@@ -58,3 +58,37 @@ export function promptSelect({
     },
   });
 }
+
+export function promptNumber({
+  title,
+  text,
+  defaultValue,
+  min = 1,
+  max,
+  confirmText = "OK",
+  cancelText = "Batal",
+}) {
+  return Swal.fire({
+    title,
+    text,
+    input: "number",
+    inputValue: defaultValue,
+    inputAttributes: {
+      min: String(min),
+      ...(max !== undefined ? { max: String(max) } : {}),
+      step: "1",
+    },
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    reverseButtons: true,
+    focusCancel: true,
+    inputValidator: (value) => {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "Harus angka";
+      if (!Number.isInteger(n)) return "Harus bilangan bulat";
+      if (n < min) return `Minimal ${min}`;
+      if (max !== undefined && n > max) return `Maksimal ${max}`;
+    },
+  });
+}

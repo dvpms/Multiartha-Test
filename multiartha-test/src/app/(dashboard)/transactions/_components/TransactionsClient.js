@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { getTransactions } from "@/features/transactions/client";
-import { canSell } from "@/features/auth/permissions";
+import { canViewSales } from "@/features/auth/permissions";
 import { formatDateTimeId, formatRupiah } from "@/lib/format";
 
 export default function TransactionsClient() {
@@ -17,7 +17,7 @@ export default function TransactionsClient() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const canView = canSell(role); // Admin/Seller
+  const canView = canViewSales(role); // Admin/Seller
 
   async function load() {
     setLoading(true);
@@ -41,7 +41,7 @@ export default function TransactionsClient() {
   if (!canView) {
     return (
       <Card>
-        <h1 className="text-xl font-semibold text-zinc-900">Transaksi</h1>
+        <h1 className="text-xl font-semibold text-zinc-900">Penjualan</h1>
         <p className="mt-1 text-sm text-zinc-600">Akses ditolak.</p>
       </Card>
     );
@@ -51,8 +51,8 @@ export default function TransactionsClient() {
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Transaksi</h1>
-          <p className="text-sm text-zinc-600">Log audit penjualan (latest).</p>
+          <h1 className="text-xl font-semibold text-zinc-900">Penjualan</h1>
+          <p className="text-sm text-zinc-600">Log penjualan (latest).</p>
         </div>
         <Button variant="secondary" onClick={load} disabled={loading}>
           Refresh
@@ -103,7 +103,7 @@ export default function TransactionsClient() {
               {!loading && rows.length === 0 ? (
                 <tr>
                   <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={5}>
-                    Belum ada transaksi.
+                    Belum ada penjualan.
                   </td>
                 </tr>
               ) : null}

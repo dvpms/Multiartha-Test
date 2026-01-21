@@ -27,6 +27,7 @@ model User {
 
   role         Role          @relation(fields: [roleId], references: [id], onDelete: Restrict)
   transactions Transaction[]
+  auditLogs    AuditLog[]    @relation("AuditLogActor")
 
   @@index([roleId])
   @@map("users")
@@ -61,4 +62,23 @@ model Transaction {
   @@index([productId])
   @@index([createdAt])
   @@map("transactions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorUserId String?  @map("actor_user_id")
+  entityType String   @map("entity_type")
+  action     String
+  entityId   String?  @map("entity_id")
+  before     Json?
+  after      Json?
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor User? @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

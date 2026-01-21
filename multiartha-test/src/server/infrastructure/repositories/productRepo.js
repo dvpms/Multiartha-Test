@@ -28,4 +28,19 @@ export const productRepo = {
       },
     });
   },
+
+  async updateById(id, data, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.update({ where: { id }, data });
+  },
+
+  async deleteById(id, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.delete({ where: { id } });
+  },
+
+  async countTransactions(id, { tx } = {}) {
+    const client = tx || prisma;
+    return client.transaction.count({ where: { productId: id } });
+  },
 };

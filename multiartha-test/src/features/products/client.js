@@ -11,3 +11,11 @@ export function createProduct(payload) {
 export function sellProduct(productId, payload) {
   return apiRequest(`/api/products/${productId}/sell`, { method: "POST", body: payload });
 }
+
+export function updateProduct(productId, payload) {
+  return apiRequest(`/api/products/${productId}`, { method: "PUT", body: payload });
+}
+
+export function deleteProduct(productId) {
+  return apiRequest(`/api/products/${productId}`, { method: "DELETE" });
+}

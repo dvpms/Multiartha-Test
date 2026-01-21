@@ -7,13 +7,14 @@ import { requireRole } from "@/server/auth/session";
 
 export async function PUT(request, { params }) {
   try {
+    const resolvedParams = await Promise.resolve(params);
     const session = await requireRole([ROLES.ADMIN]);
     const body = await request.json();
     const input = changeRoleSchema.parse(body);
 
     const result = await changeUserRole({
       actorUserId: session.user.id,
-      targetUserId: params.id,
+      targetUserId: resolvedParams.id,
       roleName: input.roleName,
     });
 

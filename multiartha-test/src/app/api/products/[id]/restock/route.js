@@ -8,16 +8,12 @@ import { jsonOk } from "@/server/http/responses";
 export async function POST(request, { params }) {
   try {
     const resolvedParams = await Promise.resolve(params);
-    const session = await requireRole([ROLES.ADMIN]);
+    await requireRole([ROLES.ADMIN]);
 
     const body = await request.json();
     const input = restockProductSchema.parse(body);
 
-    const updated = await restockProduct({
-      actorUserId: session.user.id,
-      productId: resolvedParams.id,
-      quantity: input.quantity,
-    });
+    const updated = await restockProduct({ productId: resolvedParams.id, quantity: input.quantity });
 
     return jsonOk(updated);
   } catch (error) {

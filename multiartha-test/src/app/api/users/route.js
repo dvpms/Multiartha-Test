@@ -18,10 +18,10 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const session = await requireRole([ROLES.ADMIN]);
+    await requireRole([ROLES.ADMIN]);
     const body = await request.json();
     const input = createUserSchema.parse(body);
-    const created = await createUser({ actorUserId: session.user.id, ...input });
+    const created = await createUser(input);
     return jsonOk(created, { status: 201 });
   } catch (error) {
     return handleRouteError(error);

@@ -37,7 +37,6 @@ export default function Sidebar() {
         <NavItem href="/dashboard" label="Dashboard" />
         <NavItem href="/products" label="Produk" />
         {canViewSales(role) ? <NavItem href="/transactions" label="Penjualan" /> : null}
-        {canManageUsers(role) ? <NavItem href="/activities" label="Aktivitas" /> : null}
         {canManageUsers(role) ? <NavItem href="/users" label="User Management" /> : null}
       </nav>
     </aside>

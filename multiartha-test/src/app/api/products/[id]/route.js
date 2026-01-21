@@ -9,16 +9,12 @@ import { requireRole } from "@/server/auth/session";
 export async function PUT(request, { params }) {
   try {
     const resolvedParams = await Promise.resolve(params);
-    const session = await requireRole([ROLES.ADMIN]);
+    await requireRole([ROLES.ADMIN]);
 
     const body = await request.json();
     const input = updateProductSchema.parse(body);
 
-    const updated = await updateProduct({
-      actorUserId: session.user.id,
-      productId: resolvedParams.id,
-      data: input,
-    });
+    const updated = await updateProduct({ productId: resolvedParams.id, data: input });
 
     return jsonOk(updated);
   } catch (error) {
@@ -29,9 +25,9 @@ export async function PUT(request, { params }) {
 export async function DELETE(_request, { params }) {
   try {
     const resolvedParams = await Promise.resolve(params);
-    const session = await requireRole([ROLES.ADMIN]);
+    await requireRole([ROLES.ADMIN]);
 
-    const result = await deleteProduct({ actorUserId: session.user.id, productId: resolvedParams.id });
+    const result = await deleteProduct({ productId: resolvedParams.id });
     return jsonOk(result);
   } catch (error) {
     return handleRouteError(error);

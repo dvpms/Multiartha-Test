@@ -7,6 +7,7 @@ export function handleRouteError(error) {
     return jsonError("Validation error", {
       status: 422,
       code: "VALIDATION_ERROR",
+      issues: error.issues,
     });
   }
 

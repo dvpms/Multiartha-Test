@@ -7,12 +7,13 @@ import { requireRole } from "@/server/auth/session";
 
 export async function POST(request, { params }) {
   try {
-    const session = await requireRole([ROLES.ADMIN, ROLES.SELLER]);
+    const resolvedParams = await Promise.resolve(params);
+    const session = await requireRole([ROLES.SELLER]);
     const body = await request.json();
     const input = sellProductSchema.parse(body);
 
     const result = await sellProduct({
-      productId: params.id,
+      productId: resolvedParams.id,
       userId: session.user.id,
       quantity: input.quantity,
     });

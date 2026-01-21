@@ -21,7 +21,7 @@ export async function POST(request) {
     await requireRole([ROLES.ADMIN]);
     const body = await request.json();
     const input = createProductSchema.parse(body);
-    const created = await createProduct(input);
+    const created = await createProduct({ data: input });
     return jsonOk(created, { status: 201 });
   } catch (error) {
     return handleRouteError(error);

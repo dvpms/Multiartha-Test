@@ -15,7 +15,7 @@ export async function sellProduct({ productId, userId, quantity }) {
 
     const totalPrice = product.price * quantity;
 
-    await transactionRepo.create(
+    const txRecord = await transactionRepo.create(
       { userId, productId, quantity, totalPrice },
       { tx }
     );

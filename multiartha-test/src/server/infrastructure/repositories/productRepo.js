@@ -5,10 +5,9 @@ export const productRepo = {
     return prisma.product.findMany({ orderBy: { createdAt: "desc" } });
   },
 
-  async create({ name, stock, price }) {
-    return prisma.product.create({
-      data: { name, stock, price },
-    });
+  async create({ name, stock, price }, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.create({ data: { name, stock, price } });
   },
 
   async findById(id, { tx } = {}) {
@@ -27,5 +26,30 @@ export const productRepo = {
         stock: { decrement: quantity },
       },
     });
+  },
+
+  async incrementStockById(id, quantity, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.update({
+      where: { id },
+      data: {
+        stock: { increment: quantity },
+      },
+    });
+  },
+
+  async updateById(id, data, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.update({ where: { id }, data });
+  },
+
+  async deleteById(id, { tx } = {}) {
+    const client = tx || prisma;
+    return client.product.delete({ where: { id } });
+  },
+
+  async countTransactions(id, { tx } = {}) {
+    const client = tx || prisma;
+    return client.transaction.count({ where: { productId: id } });
   },
 };
